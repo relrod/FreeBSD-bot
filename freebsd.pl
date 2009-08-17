@@ -7,6 +7,8 @@ use ProblemReport;
 package FreeBSD;
 use base qw( Bot::BasicBot );
 
+my $version = "1.1";
+
 sub said{
 	my $self	= shift;
 	my $info	= shift;
@@ -15,10 +17,14 @@ sub said{
 	my $mask	= $info->{raw_nick};
 	my $channel	= $info->{channel};
 	
-	if($text =~ /^!test$/i){
-		$self->reply($info,"Y HALO THAR, $nick! LAWL.");
+	if($text =~ /^!version$/i){
+		$self->reply($info,"FreeBSD-Bot Version 1.0 by CodeBlock  |  http://github.com/CodeBlock/FreeBSD-bot/");
 	}
 
+	if($text =~ /^!commands$/i){
+		$self->reply($info,"<category/portname>: fetch info. about a port; [category/id]: fetch info. about a Problem Report.");
+	}
+	
 	if($text =~ /<([\w]+)\/([\w\-]+)>/i){
 		$self->reply($info,PortLookup::port($1,$2));
 	}
