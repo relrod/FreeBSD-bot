@@ -28,5 +28,6 @@ sub pr{
 		
 		}
 	}
-return $return;
+	return $return;
 }
+1; # Make perl happy.
