@@ -11,7 +11,7 @@ How To Use
 
 Requirements
 ------------
-The bot uses POE::Component::IRC. On FreeBSD you can get this from ports. It also uses HTML::TableExtract, and LWP::Simple.
+The bot uses Bot::BasicBot. On FreeBSD you can get this from ports. It also uses HTML::TableExtract, and LWP::Simple.
 
 License
 -------
