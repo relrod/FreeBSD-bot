@@ -1,6 +1,8 @@
 #!/usr/local/env perl
 use warnings;
 use strict;
+use PortLookup;
+use ProblemReport;
 
 package FreeBSD;
 use base qw( Bot::BasicBot );
@@ -15,6 +17,14 @@ sub said{
 	
 	if($text =~ /^!test$/i){
 		$self->reply($info,"Y HALO THAR, $nick! LAWL.");
+	}
+
+	if($text =~ /<([\w]+)\/([\w\-]+)>/i){
+		$self->reply($info,PortLookup::port($1,$2));
+	}
+
+	if($text =~ /\[([\w]+)\/([\d]+)\]/i){
+		$self->reply($info,ProblemReport::pr($1,$2));
 	}
 
 }
