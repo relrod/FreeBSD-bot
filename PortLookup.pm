@@ -24,7 +24,7 @@ sub port {
 			#print scalar(@$row[1])."\n";
 		}
 	}
-	if($return != "$category/$name "){
+	if($return ne "$category/$name "){
 		return $return;
 	} else {
 		return "The port $category/$name was not found.";
