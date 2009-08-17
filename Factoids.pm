@@ -14,14 +14,29 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=DATABASE.sqlite3","","",{AutoCommit =>
 sub retrieve {
 	my $id = shift;
 	my $out = "";
+	my $action;
+	my $locked;
+	my $notitle;
 	my $prep = $dbh->prepare("SELECT * FROM factoids WHERE title=?");
 	$prep->execute($id);
 	my $row = $prep->fetch;
 	
-	foreach my $r (@$row){
-		$out .= $r."  ";
+	my @flags = split(/ /, @$row[3]);
+	foreach my $flag (@flags){
+		if($flag == "ACTION"){
+			$action = 1;
+		}
+		if($flag == "LOCKED"){
+			$locked = 1;
+		}
+		if($flag == "NOTITLE"){
+			$notitle = 1;
+		}
 	}
-	#print Dumper(@$row[1]);
+
+
+	
+	print Dumper(@$row);
 	if($out ne ""){
 		return $out;
 	} else {
