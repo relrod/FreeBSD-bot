@@ -4,9 +4,11 @@ use strict;
 use PortLookup;
 use ProblemReport;
 use Factoids;
+use Levels;
 
 package FreeBSD;
 use base qw( Bot::BasicBot );
+use Data::Dumper
 
 my $version = "1.1";
 
@@ -15,7 +17,9 @@ sub said{
 	my $info	= shift;
 	my $text	= $info->{body};
 	my $nick	= $info->{who};
-	my $mask	= $info->{raw_nick};
+	my $rawnick	= $info->{raw_nick};
+	my @rlmask	= split(/\@/,$rawnick);
+	my $mask 	= $rlmask[1];
 	my $channel	= $info->{channel};
 	
 	if($text =~ /^!version$/i){
@@ -33,6 +37,36 @@ sub said{
 	elsif($text =~ /\[([\w]+)\/([\d]+)\]/i){
 		$self->reply($info,ProblemReport::pr($1,$2));
 	}
+	
+	# <admin>
+		# <levels>
+	elsif(($text =~ /^!levels? (?:group|status|current|get) ([\w\-\`\[\]\\\:\.\/]+)/i) and (Levels::group($mask) eq "ADMIN")){
+		#my $response = Levels::group($1);
+		$self->reply($info,Levels::group($1));
+	}
+
+	elsif(($text =~ /^!levels? (edit|update|add) ([\w\-\`\\\[\]\_\.\:\/]+) ([\w]+)/i) and (Levels::group($mask) eq "ADMIN")){
+		$self->reply($info,Levels::pluslevel($1,$2, $3));
+	}
+	
+		# </levels>
+	# </admin>
+
+	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:edit|change|modify|update) (.*) = (.*)/i) and (Levels::canEditFact($mask))){
+		$self->reply($info,"Hi, You're able to edit facts, but this feature has not been implemented yet.");
+	}
+	
+	elsif($text =~ /^!check$/i){
+		if(Levels::canEditFact($mask)){
+			$self->reply($info,"you can edit facts");
+		} else {
+			$self->reply($info,"nice try");
+		}
+	}
+
+	elsif($text =~ /^!(?:fi|factinfo|fact info|info) (.*)/i){
+		$self->reply($info,Factoids::factinfo($1));
+	}
 
 	elsif($text =~ /^!(.*)/i) { # Factoid-time!
 		$self->reply($info,Factoids::retrieve($1));
@@ -43,7 +77,7 @@ sub said{
 FreeBSD->new(
 	server		=> "cesium.eighthbit.net",
 	port		=> 6667,
-	channels	=> ["#offtopic"],
+	channels	=> ["#codeblock"],
 	nick		=> "FreeBSD",
 	alt_nicks	=> ["BSDbot","BSD"],
 	username	=> "FreeBSD",
