@@ -56,6 +56,18 @@ sub said{
 		$self->reply($info,"Hi, You're able to edit facts, but this feature has not been implemented yet.");
 	}
 	
+
+	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:add|register|new|create) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)?(.*)/i) and (Levels::canEditFact($mask))){
+		my $commit = Factoids::commit($1,$3,$2);
+		my $flags;
+		if($commit){
+			my $flags = "with flags $2" if($2);
+			$self->reply($info,"If I were finished being coded, I would have added factoid '$1' $flags");
+		} else {
+			$self->reply($info,"Uh Oh - Kersplam! I was unable to add the factoid to the database.");
+		}
+	}
+
 	elsif($text =~ /^!check$/i){
 		if(Levels::canEditFact($mask)){
 			$self->reply($info,"you can edit facts");
@@ -74,10 +86,21 @@ sub said{
 
 }
 
+#FreeBSD->new(
+#	server		=> "10.10.10.165",
+#	port		=> 6667,
+#	channels	=> ["#offtopic"],
+#	nick		=> "FreeBSD",
+#	alt_nicks	=> ["BSDbot","BSD"],
+#	username	=> "FreeBSD",
+#	name		=> "FreeBSD Information Bot.",
+#	charset		=> "utf-8"
+#)->run();
+
 FreeBSD->new(
 	server		=> "cesium.eighthbit.net",
 	port		=> 6667,
-	channels	=> ["#codeblock"],
+	channels	=> ["#offtopic","#freebsd"],
 	nick		=> "FreeBSD",
 	alt_nicks	=> ["BSDbot","BSD"],
 	username	=> "FreeBSD",

@@ -6,6 +6,17 @@ use warnings;
 use strict;
 
 package Factoids;
+#Database Schema:
+#
+#id integer primary key,
+#title varchar(255),
+#response text,
+#flag varchar(10),
+#by_nick varchar(20),
+#by_host varchar(100),
+#date_time varchar(30)
+#
+
 use DBI;
 use Data::Dumper;
 
@@ -52,14 +63,28 @@ sub retrieve {
 	
 }
 
+sub commit {
+	my $title = shift;
+	my $response = shift;
+	my $flags = shift;
+	my $nick = shift;
+	my $host = shift;
+	my $time = time();
+	my $prep = $dbh->prepare("INSERT INTO factoids(title,response,flag,by_nick,by_host,date_time) VALUES(?,?,?,?,?,?)");
+	if($prep->execute($title,$response,$flags,$nick,$host,$time)){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 sub factinfo {
 	my $id = shift;
 	my $out;
-	my @factinfo;
 	my $prep = $dbh->prepare("SELECT * FROM factoids WHERE title=?");
 	$prep->execute($id);
 	my $row = $prep->fetch;
-	return "Information about ".chr(2).$id.chr(2).": [".@$row[3]."] :: Added by ".@$row[4]." using mask ".@$row[5]." @ ".@$row[6];
+	return "Information about ".chr(2).$id.chr(2).": [".@$row[3]."] :: Added by ".@$row[4]." using mask ".@$row[5]." @ ".localtime(@$row[6]);
 }
 
 
