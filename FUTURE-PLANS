@@ -2,7 +2,9 @@ In the future here's some ideas that I'd like to implement:
 	- More optional modules, preferably that can be enabled/disabled while running.
 		Some of these might include:
 			- Factoids (using sqlite3).
-			- Level System (simple).
+			!- Level System (simple).
 			- base-command finder (info TBA...almost done with this anyway).
 			- misc (would include some random/fun commands..this is not a priority).
 	- Optional new port notifications (of new committed ports) in a channel.
+
+*  !- means done.

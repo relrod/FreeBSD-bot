@@ -28,6 +28,10 @@ sub pr{
 		
 		}
 	}
-	return $return;
+	if($return !~ /Repocopy\n/){ #hackish for now. TODO.
+		return $return;
+	} else {
+		return "PR not found.";
+	}
 }
 1; # Make perl happy.
