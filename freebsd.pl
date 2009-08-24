@@ -57,12 +57,10 @@ sub said{
 	}
 	
 
-	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:add|register|new|create) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)?(.*)/i) and (Levels::canEditFact($mask))){
-		my $commit = Factoids::commit($1,$3,$2);
-		my $flags;
+	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:add|register|commit|new|create) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)? ?(.*)/i) and (Levels::canEditFact($mask))){
+		my $commit = Factoids::commit($1,$3,$2,$nick,$mask);
 		if($commit){
-			my $flags = "with flags $2" if($2);
-			$self->reply($info,"If I were finished being coded, I would have added factoid '$1' $flags");
+			$self->reply($info,"Commited '$1' => $3");
 		} else {
 			$self->reply($info,"Uh Oh - Kersplam! I was unable to add the factoid to the database.");
 		}

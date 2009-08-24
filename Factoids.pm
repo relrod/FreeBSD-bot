@@ -20,13 +20,12 @@ package Factoids;
 use DBI;
 use Data::Dumper;
 
-my $dbh = DBI->connect("dbi:SQLite:dbname=DATABASE.sqlite3","","",{AutoCommit => 0, PrintError => 1});
+my $dbh = DBI->connect("dbi:SQLite:dbname=DATABASE.sqlite3","","",{AutoCommit => 1, PrintError => 1});
 
 sub retrieve {
 	my $id = shift;
 	my $out = '';
 	my $action;
-	my $locked;
 	my $notitle;
 	my $prep = $dbh->prepare("SELECT * FROM factoids WHERE title=?");
 	$prep->execute($id);
@@ -70,6 +69,10 @@ sub commit {
 	my $nick = shift;
 	my $host = shift;
 	my $time = time();
+	$flags =~ s/<act>/ACTION/;
+	$flags =~ s/<action>/ACTION/;
+	$flags =~ s/<notitle>/NOTITLE/;
+	$flags = "NORMAL" if($flags eq "");
 	my $prep = $dbh->prepare("INSERT INTO factoids(title,response,flag,by_nick,by_host,date_time) VALUES(?,?,?,?,?,?)");
 	if($prep->execute($title,$response,$flags,$nick,$host,$time)){
 		return 1;
@@ -86,7 +89,6 @@ sub factinfo {
 	my $row = $prep->fetch;
 	return "Information about ".chr(2).$id.chr(2).": [".@$row[3]."] :: Added by ".@$row[4]." using mask ".@$row[5]." @ ".localtime(@$row[6]);
 }
-
 
 
 1; # Make perl happy.

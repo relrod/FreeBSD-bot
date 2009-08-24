@@ -9,7 +9,7 @@ package Levels;
 use DBI;
 use Data::Dumper;
 
-my $dbh = DBI->connect("dbi:SQLite:dbname=DATABASE.sqlite3","","",{AutoCommit => 0, PrintError => 1});
+my $dbh = DBI->connect("dbi:SQLite:dbname=DATABASE.sqlite3","","",{AutoCommit => 1, PrintError => 1});
 
 sub group {
 	my $hostmask = shift;
