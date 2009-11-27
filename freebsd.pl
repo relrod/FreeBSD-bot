@@ -8,9 +8,26 @@ use Levels;
 
 package FreeBSD;
 use base qw( Bot::BasicBot );
-use Data::Dumper
+use Data::Dumper;
 
 my $version = "1.1";
+
+my @eatresponses = (
+	'sends Beastie after $nick',
+	'brutally murders $nick from the inside out.',
+	'cries at being eaten and executes a script to get out.',
+	'blinks a few times and punches random $nick-guts',
+	'laughs at how you think you\'re all leet... Don\'t look behind you.. bwhahaha XD',
+	'tells you not to go there.',
+	'says something to the effect of, "Hey now, what was that for!?"',
+	'snickers some comment about Linux',
+	'mumbles something about Windows...',
+	'glares at $nick and laughs hysterically for no reason.',
+	'watches $nick be all "lol im s0 1337"',
+	'feels eaten.',
+	'eats $nick in return',
+	'cries.',
+);
 
 sub said{
 	my $self	= shift;
@@ -30,14 +47,35 @@ sub said{
 		$self->reply($info,"<category/portname>: fetch info. about a port; [category/id]: fetch info. about a Problem Report.");
 	}
 	
-	elsif($text =~ /<([\w]+)\/([\w\-]+)>/i){
-		$self->reply($info,PortLookup::port($1,$2));
+	elsif(my @portqueries = $text =~ /<([\w]+\/[\w\-\d]+)>/ig){
+		my $result;
+		my $donenumber = 0;
+		foreach my $port (@portqueries){
+			if($donenumber == 3){
+				$result .= "Maximum limit of three port queries per message reached.";
+				last;
+			}
+			my @portsplit = split(/\//,$port);
+         if($portsplit[0] !~ /(?:base|community|extra|aur)/i){
+   			$result .= PortLookup::port($portsplit[0],$portsplit[1])."\n";
+         }
+			$donenumber++;
+		}
+      if($result){
+   		$self->reply($info,$result);
+      }
 	}
 
-	elsif($text =~ /\[([\w]+)\/([\d]+)\]/i){
+	elsif($text =~ /\[([a-z]+)\/([\d]+)\]/i){
 		$self->reply($info,ProblemReport::pr($1,$2));
 	}
 	
+	elsif($text =~ /^eats FreeBSD/i){
+		my $random = $eatresponses[int rand(@eatresponses)];
+		$random =~ s/\$nick/$nick/g;
+		$self->emote(who=>$nick,channel=>$channel,body=>$random);
+	}
+
 	# <admin>
 		# <levels>
 	elsif(($text =~ /^!levels? (?:group|status|current|get) ([\w\-\`\[\]\\\:\.\/]+)/i) and (Levels::group($mask) eq "ADMIN")){
@@ -52,15 +90,25 @@ sub said{
 		# </levels>
 	# </admin>
 
-	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:edit|change|modify|update) (.*) = (.*)/i) and (Levels::canEditFact($mask))){
-		$self->reply($info,"Hi, You're able to edit facts, but this feature has not been implemented yet.");
+	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:edit|change|modify|update) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)? ?(.*)/i) and (Levels::canEditFact($mask))){
+		my $edit = Factoids::edit($1,$3,$2,$nick,$mask);
+		if($edit){
+			$self->reply($info,"EditCommit '$1' => $3");
+		} else {
+			$self->reply($info,"EditCommit Failed.");
+		}
+		#$self->reply($info,"Hi, You're able to edit facts, but this feature has not been implemented yet.");
 	}
-	
 
-	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:add|register|commit|new|create) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)? ?(.*)/i) and (Levels::canEditFact($mask))){
-		my $commit = Factoids::commit($1,$3,$2,$nick,$mask);
+	elsif(($text =~ /^!(?:facts|fact|factoid|factoids) (?:add|register|commit|new|create) (.*) ?= ?(<nopre>|<noprefix>|<notitle>|<act>|<action>)? ?(?:'|")?(.*)(?:'|")?/i) and (Levels::canEditFact($mask))){
+      my $input = $1;
+      my $flags = $2;
+      my $response = $3;
+      $response =~ s/(?:'|")$//;
+      $input  =~ s/ +$//;
+		my $commit = Factoids::commit($input,$response,$flags,$nick,$mask);
 		if($commit){
-			$self->reply($info,"Commited '$1' => $3");
+			$self->reply($info,"Commited '$input' => $response");
 		} else {
 			$self->reply($info,"Uh Oh - Kersplam! I was unable to add the factoid to the database.");
 		}
@@ -81,7 +129,8 @@ sub said{
 	elsif($text =~ /^!(.*)/i) { # Factoid-time!
 		$self->reply($info,Factoids::retrieve($1));
 	}
-
+	
+	return;
 }
 
 #FreeBSD->new(
@@ -95,13 +144,46 @@ sub said{
 #	charset		=> "utf-8"
 #)->run();
 
-FreeBSD->new(
-	server		=> "cesium.eighthbit.net",
+my $eighthbit = FreeBSD->new(
+	server		=> "irc.eighthbit.net",
 	port		=> 6667,
-	channels	=> ["#offtopic","#freebsd"],
+	channels	=> ["#bots"],#,"#offtopic","#freebsd","#codeblock","#baddog"],
 	nick		=> "FreeBSD",
 	alt_nicks	=> ["BSDbot","BSD"],
 	username	=> "FreeBSD",
 	name		=> "FreeBSD Information Bot.",
+	no_run		=> 1,
 	charset		=> "utf-8"
-)->run();
+);
+
+my $freenode = FreeBSD->new(
+	server		=> "irc.freenode.net",
+	port		=> 6667,
+	channels	=> ["#botters"],
+	nick		=> "FreeBSD-bot",
+	alt_nicks	=> ["BSDbot","BSD"],
+	username	=> "FreeBSD",
+	name		=> "FreeBSD Information Bot.",
+	no_run		=> 1,
+	charset		=> "utf-8"
+);
+
+
+#my $vega = FreeBSD->new(
+#	server		=> "vega.eighthbit.net",
+#	port		=> 6667,
+#	channels	=> ["#raw"],
+#	nick		=> "FreeBSD",
+#	alt_nicks	=> ["BSDbot","BSD"],
+#	username	=> "FreeBSD",
+#	name		=> "FreeBSD Information Bot.",
+#	no_run		=> 1,
+#	charset		=> "utf-8"
+#);
+
+$eighthbit->run();
+#$freenode->run();
+#$vega->run();
+
+use POE;
+$poe_kernel->run();

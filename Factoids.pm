@@ -69,10 +69,11 @@ sub commit {
 	my $nick = shift;
 	my $host = shift;
 	my $time = time();
-	$flags =~ s/<act>/ACTION/;
-	$flags =~ s/<action>/ACTION/;
-	$flags =~ s/<notitle>/NOTITLE/;
-	$flags = "NORMAL" if($flags eq "");
+   if($flags){
+   	$flags =~ s/<(?:action|act)>/ACTION/;
+   	$flags =~ s/<(?:notitle|nopre|noprefix)>/NOTITLE/;
+   	$flags = "NORMAL" if($flags eq "");
+   }
 	my $prep = $dbh->prepare("INSERT INTO factoids(title,response,flag,by_nick,by_host,date_time) VALUES(?,?,?,?,?,?)");
 	if($prep->execute($title,$response,$flags,$nick,$host,$time)){
 		return 1;
