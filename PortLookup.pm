@@ -33,6 +33,6 @@ sub port {
 
 sub searchports {
    my $keywords = shift;
-
+}
 
 1; # Make perl happy.
