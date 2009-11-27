@@ -66,6 +66,14 @@ sub said{
       }
 	}
 
+   elsif($text =~ /<(keyword|maintainer|desc|description):([\w\d\.\-\_\@\ ]+)>/i){
+      my $search_by = lc($1);
+      my $keywords = $2;
+
+      # And throw it to portsearch().
+      return PortLookup::portsearch($search_by, $keywords);
+   }
+
 	elsif($text =~ /\[([a-z]+)\/([\d]+)\]/i){
 		$self->reply($info,ProblemReport::pr($1,$2));
 	}

@@ -3,6 +3,7 @@
 
 use warnings;
 use strict;
+use Switch;
 
 package PortLookup;
 use LWP::Simple;
@@ -31,8 +32,30 @@ sub port {
 	}
 }
 
-sub searchports {
+sub shortenurl {
+   my $long_url = shift;
+   my $short_url;
+   $short_url = get("http://is.gd/api.php?longurl=$long_url");
+   if($short_url =~ /The URL you entered is on our blacklist /){
+      return $long_url;
+   }
+   return $short_url;
+}
+
+sub portsearch {
+   my $search_by = shift;
    my $keywords = shift;
+   my $s_cat;
+   switch($search_by) {
+      case "maintainer" { $s_cat = 'maintainer'; }
+      case "keyword" { $s_cat = 'all'; }
+      case "name" { $s_cat = 'name'; }
+      case "desc" { $s_cat = 'text'; }
+      case "description" { $s_cat = 'text'; }
+   }
+
+   my $results = get("http://www.freebsd.org/cgi/ports.cgi?query=$keywords&stype=$s_cat&sektion=all");
+   return "I exist and you poked me with k:$keywords, s:$search_by, scat:$s_cat";
 }
 
 1; # Make perl happy.
