@@ -1,0 +1,24 @@
+This lists the most important features of FreeBSD-bot.
+The non-important stuff will be weeded out from the bot altogether
+at some point in the near future.
+
+Port Lookup:
+   <category/portname>
+
+
+## Future Commands:
+
+Port Search:
+   <keyword:[terms]>
+   <maintainer:[terms]>
+   <desc:[terms]> or <description:[terms]>
+
+ManPage Lookup:
+   !man [command]
+   <man:[command]>
+
+FreeBSD Forums:
+   <forums:[topic_id]>
+   <forums:[topic_id].[postnumber]>
+   !forums [topic_id]
+   !forms [topic_id] [postnumber]

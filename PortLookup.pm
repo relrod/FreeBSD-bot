@@ -30,4 +30,9 @@ sub port {
 		return "The port you've tried to look up ($category/$name), was not found.";
 	}
 }
+
+sub searchports {
+   my $keywords = shift;
+
+
 1; # Make perl happy.
