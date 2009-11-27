@@ -5,6 +5,9 @@ In the future here's some ideas that I'd like to implement:
 			!- Level System (simple).
 			- base-command finder (info TBA...almost done with this anyway).
 			- misc (would include some random/fun commands..this is not a priority).
+         - man pages module. This had existed but used an ugly database.
+           I'd like to find an online manpage API and use this.
+         - Port searching.
 	- Optional new port notifications (of new committed ports) in a channel.
 
 *  !- means done.
